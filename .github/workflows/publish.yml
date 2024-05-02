@@ -5,8 +5,9 @@ name: Create Release
 
 on:
   push:
-    tags:
-      - v*
+    branches:
+      - main
+  workflow_dispatch:
 
 # Needed to create release and upload assets
 permissions:
@@ -28,6 +29,12 @@ jobs:
         run: |
           echo "release_tag=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
 
+      - name: Delete
+        uses: ame-yu/action-delete-latest-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: $ {{ github.repository }}
+            
       - name: Create Release
         id: create_release
         uses: "actions/github-script@v6"
@@ -47,10 +54,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-          os: ['ubuntu-20.04']
-          python-version: ['3.8', '3.9', '3.10', '3.11']
-          pytorch-version: ['2.3.0']  # Must be the most recent version that meets requirements-cuda.txt.
-          cuda-version: ['11.8', '12.1']
+          os: ['ubuntu-22.04']
+          python-version: ['3.10', '3.11']
+          pytorch-version: ['2.3.0']  # Must be the most recent version that meets requirements.txt.
+          cuda-version: [ '12.1']
 
     steps:
       - name: Checkout

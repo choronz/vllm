@@ -16,6 +16,8 @@ export MAX_JOBS=1
 # Make sure punica is built for the release (for LoRA)
 export VLLM_INSTALL_PUNICA_KERNELS=1
 # Make sure release wheels are built for the following architectures
-export TORCH_CUDA_ARCH_LIST="7.0 7.5 8.0 8.6 8.9 9.0+PTX"
+
+export TORCH_CUDA_ARCH_LIST="8.9"
+
 # Build
 $python_executable setup.py bdist_wheel --dist-dir=dist
