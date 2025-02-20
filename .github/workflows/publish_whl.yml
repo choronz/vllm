@@ -64,8 +64,8 @@ jobs:
       matrix:
           os: ['ubuntu-22.04']
           python-version: ['3.12', '3.13']
-          pytorch-version: ['2.5.1']  Must be the most recent version that meets requirements-cuda.txt.
-          cuda-version: ['12.5']
+          pytorch-version: ['2.5.1'] # Must be the most recent version that meets requirements-cuda.txt.
+          cuda-version: ['12.4']
 
     steps:
       - name: Checkout
@@ -115,7 +115,6 @@ jobs:
           asset_path: ./dist/${{ env.wheel_name }}
           asset_name: ${{ env.asset_name }}
           asset_content_type: application/*
-
 
       # (Danielkinz): This last step will publish the .whl to pypi. Warning: untested
       # - name: Publish package
