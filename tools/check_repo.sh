@@ -7,7 +7,7 @@ if ! git diff --quiet; then
 	exit 1
 fi
 
-if ! git describe --tags; then
+if ! git describe --tags `git rev-list --tags --max-count=1`; then
 	echo "No tags are present. Is this a shallow clone? git fetch --unshallow --tags" >&2
 
 	exit 1
