@@ -28,10 +28,10 @@ set(ignoreMe "${VLLM_PYTHON_PATH}")
 # Supported python versions.  These versions will be searched in order, the
 # first match will be selected.  These should be kept in sync with setup.py.
 #
-set(PYTHON_SUPPORTED_VERSIONS "3.11" "3.12")
+set(PYTHON_SUPPORTED_VERSIONS "3.11" "3.12", "3.13")
 
 # Supported NVIDIA architectures.
-set(CUDA_SUPPORTED_ARCHS "8.0;8.9")
+set(CUDA_SUPPORTED_ARCHS "8.0;8.6;8.9")
 
 # Supported AMD GPU architectures.
 set(HIP_SUPPORTED_ARCHS "gfx906;gfx908;gfx90a;gfx940;gfx941;gfx942;gfx1030;gfx1100;gfx1101")
