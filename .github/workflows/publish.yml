@@ -4,6 +4,13 @@
 name: Create Release
 
 on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Tag release version'
+        required: true
+        default: 'v0.9.2'
+        type: string
   push:
     tags:
       - v*
