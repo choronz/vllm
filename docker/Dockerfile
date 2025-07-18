@@ -120,12 +120,12 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 ENV UV_HTTP_TIMEOUT=500
 ENV UV_INDEX_STRATEGY="unsafe-best-match"
 
-# Upgrade to GCC 10 to avoid https://gcc.gnu.org/bugzilla/show_bug.cgi?id=92519
-# as it was causing spam when compiling the CUTLASS kernels
+# Upgrade to GCC 13
 RUN apt-get install software-properties-common
+# RUN apt-get install --reinstall python3-apt
+RUN ls -l /usr/lib/python3/dist-packages/ | grep apt_pkg
+RUN ln -s /usr/lib/python3/dist-packages/apt_pkg.cpython-312-x86_64-linux-gnu.so apt_pkg.so
 RUN apt-get update
-RUN apt-get install --reinstall python3-apt
-# RUN apt install --reinstall python3 python python3-minimal --fix-broken
 RUN add-apt-repository -y ppa:ubuntu-toolchain-r/ppa
 # RUN add-apt-repository -y ppa:ubuntu-toolchain-r/test
 RUN apt-get update
