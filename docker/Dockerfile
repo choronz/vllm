@@ -115,15 +115,15 @@ ENV UV_HTTP_TIMEOUT=500
 ENV UV_INDEX_STRATEGY="unsafe-best-match"
 
 # Upgrade to GCC 13
-RUN apt-get install --reinstall python3-apt
+# RUN apt-get install --reinstall python3-apt
 # RUN ls -l /usr/lib/python3/dist-packages/ | grep apt_pkg
-RUN ln -s /usr/lib/python3/dist-packages/apt_pkg.cpython-312-x86_64-linux-gnu.so apt_pkg.so
+# RUN ln -s /usr/lib/python3/dist-packages/apt_pkg.cpython-312-x86_64-linux-gnu.so apt_pkg.so
+# RUN add-apt-repository -y ppa:ubuntu-toolchain-r/ppa        # test
+
 RUN apt-get update
-RUN add-apt-repository -y ppa:ubuntu-toolchain-r/ppa
-# RUN add-apt-repository -y ppa:ubuntu-toolchain-r/test
-RUN apt-get update
-RUN apt-get install -y gcc-13 g++-13
-RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 130 --slave /usr/bin/g++ g++ /usr/bin/g++-13
+RUN apt-get install -y gcc-12 g++-12
+RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-12 120 --slave /usr/bin/g++ g++ /usr/bin/g++-12
+# RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 130 --slave /usr/bin/g++ g++ /usr/bin/g++-13
 RUN <<EOF
 gcc --version
 EOF
