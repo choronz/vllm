@@ -10,8 +10,8 @@ ARG PYTHON_VERSION=3.12
 #
 # Example:
 # docker build --build-arg BUILD_BASE_IMAGE=registry.acme.org/mirror/nvidia/cuda:${CUDA_VERSION}-devel-ubuntu20.04
-ARG BUILD_BASE_IMAGE=nvidia/cuda:${CUDA_VERSION}-devel-ubuntu24.04
-ARG FINAL_BASE_IMAGE=nvidia/cuda:${CUDA_VERSION}-devel-ubuntu24.04
+ARG BUILD_BASE_IMAGE=nvidia/cuda:${CUDA_VERSION}-devel-ubuntu22.04
+ARG FINAL_BASE_IMAGE=nvidia/cuda:${CUDA_VERSION}-devel-ubuntu22.04
 
 # By parameterizing the Deadsnakes repository URL, we allow third-party to use
 # their own mirror. When doing so, we don't benefit from the transparent
@@ -78,7 +78,7 @@ ARG GET_PIP_URL
 RUN echo 'tzdata tzdata/Areas select America' | debconf-set-selections \
     && echo 'tzdata tzdata/Zones/America select Los_Angeles' | debconf-set-selections \
     && apt-get update -y \
-    && apt-get install -y ccache software-properties-common git curl python3-apt sudo \
+    && apt-get install -y ccache software-properties-common git curl sudo \
     && if [ ! -z ${DEADSNAKES_MIRROR_URL} ] ; then \
         if [ ! -z "${DEADSNAKES_GPGKEY_URL}" ] ; then \
             mkdir -p -m 0755 /etc/apt/keyrings ; \
@@ -115,10 +115,9 @@ ENV UV_HTTP_TIMEOUT=500
 ENV UV_INDEX_STRATEGY="unsafe-best-match"
 
 # Upgrade to GCC 13
-# RUN apt-get install --reinstall python3-apt
+RUN apt-get install --reinstall python3-apt
 # RUN ls -l /usr/lib/python3/dist-packages/ | grep apt_pkg
 RUN ln -s /usr/lib/python3/dist-packages/apt_pkg.cpython-312-x86_64-linux-gnu.so apt_pkg.so
-# RUN apt-get install python3-apt --reinstall
 RUN apt-get update
 RUN add-apt-repository -y ppa:ubuntu-toolchain-r/ppa
 # RUN add-apt-repository -y ppa:ubuntu-toolchain-r/test
