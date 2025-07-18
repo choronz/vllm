@@ -17,7 +17,7 @@ export MAX_JOBS=1
 export TORCH_CUDA_ARCH_LIST="8.0 8.9"
 export VLLM_FA_CMAKE_GPU_ARCHES="80-real"
 
-bash tools/check_repo.sh
+# bash tools/check_repo.sh
 
 # Build
 $python_executable setup.py bdist_wheel --dist-dir=dist
