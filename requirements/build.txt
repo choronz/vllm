@@ -1,3 +1,5 @@
+--extra-index-url https://download.pytorch.org/whl/cu126
+
 # Should be mirrored in pyproject.toml
 cmake>=3.26.1
 ninja
