@@ -6,7 +6,7 @@
 # docs/contributing/dockerfile/dockerfile.md and
 # docs/assets/contributing/dockerfile-stages-dependency.png
 
-ARG CUDA_VERSION=12.8.1
+ARG CUDA_VERSION=12.6.3
 ARG PYTHON_VERSION=3.12
 
 # By parameterizing the base images, we allow third-party to use their own
@@ -15,7 +15,7 @@ ARG PYTHON_VERSION=3.12
 #
 # Example:
 # docker build --build-arg BUILD_BASE_IMAGE=registry.acme.org/mirror/nvidia/cuda:${CUDA_VERSION}-devel-ubuntu20.04
-ARG BUILD_BASE_IMAGE=nvidia/cuda:${CUDA_VERSION}-devel-ubuntu20.04
+ARG BUILD_BASE_IMAGE=nvidia/cuda:${CUDA_VERSION}-devel-ubuntu22.04
 ARG FINAL_BASE_IMAGE=nvidia/cuda:${CUDA_VERSION}-devel-ubuntu22.04
 
 # By parameterizing the Deadsnakes repository URL, we allow third-party to use
@@ -122,8 +122,8 @@ ENV UV_INDEX_STRATEGY="unsafe-best-match"
 
 # Upgrade to GCC 10 to avoid https://gcc.gnu.org/bugzilla/show_bug.cgi?id=92519
 # as it was causing spam when compiling the CUTLASS kernels
-RUN apt-get install -y gcc-10 g++-10
-RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 110 --slave /usr/bin/g++ g++ /usr/bin/g++-10
+RUN apt-get install -y gcc-14 g++-14
+RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 14 --slave /usr/bin/g++ g++ /usr/bin/g++-14
 RUN <<EOF
 gcc --version
 EOF
@@ -137,21 +137,6 @@ RUN ldconfig /usr/local/cuda-$(echo $CUDA_VERSION | cut -d. -f1,2)/compat/
 WORKDIR /workspace
 
 # install build and runtime dependencies
-
-# arm64 (GH200) build follows the practice of "use existing pytorch" build,
-# we need to install torch and torchvision from the nightly builds first,
-# pytorch will not appear as a vLLM dependency in all of the following steps
-# after this step
-RUN --mount=type=cache,target=/root/.cache/uv \
-    if [ "$TARGETPLATFORM" = "linux/arm64" ]; then \
-        uv pip install --system \
-            --index-url ${PYTORCH_CUDA_NIGHTLY_INDEX_BASE_URL}/cu$(echo $CUDA_VERSION | cut -d. -f1,2 | tr -d '.') \
-            "torch==2.8.0.dev20250318+cu128" "torchvision==0.22.0.dev20250319";  \
-        uv pip install --system \
-            --index-url ${PYTORCH_CUDA_NIGHTLY_INDEX_BASE_URL}/cu$(echo $CUDA_VERSION | cut -d. -f1,2 | tr -d '.') \
-            --pre pytorch_triton==3.3.0+gitab727c40; \
-    fi
-
 COPY requirements/common.txt requirements/common.txt
 COPY requirements/cuda.txt requirements/cuda.txt
 RUN --mount=type=cache,target=/root/.cache/uv \
@@ -161,11 +146,11 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 # cuda arch list used by torch
 # can be useful for both `dev` and `test`
 # explicitly set the list to avoid issues with torch 2.2
-# see https://github.com/pytorch/pytorch/pull/123243
-ARG torch_cuda_arch_list='7.0 7.5 8.0 8.9 9.0 10.0 12.0'
+# see https://github.com/pytorch/pytorch/pull/123243    9.0 10.0 12.0'
+ARG torch_cuda_arch_list='8.0 8.9'
 ENV TORCH_CUDA_ARCH_LIST=${torch_cuda_arch_list}
 # Override the arch list for flash-attn to reduce the binary size
-ARG vllm_fa_cmake_gpu_arches='80-real;90-real'
+ARG vllm_fa_cmake_gpu_arches='80-real'
 ENV VLLM_FA_CMAKE_GPU_ARCHES=${vllm_fa_cmake_gpu_arches}
 #################### BASE BUILD IMAGE ####################
 
@@ -399,12 +384,12 @@ RUN --mount=type=cache,target=/root/.cache/uv bash - <<'BASH'
     # Exclude CUDA arches for older versions (11.x and 12.0-12.7)
     # TODO: Update this to allow setting TORCH_CUDA_ARCH_LIST as a build arg.
     if [[ "${CUDA_VERSION}" == 11.* ]]; then
-        FI_TORCH_CUDA_ARCH_LIST="7.5 8.0 8.9"
+        FI_TORCH_CUDA_ARCH_LIST="8.0 8.9"
     elif [[ "${CUDA_VERSION}" == 12.[0-7]* ]]; then
-        FI_TORCH_CUDA_ARCH_LIST="7.5 8.0 8.9 9.0a"
+        FI_TORCH_CUDA_ARCH_LIST="8.0 8.9"
     else
         # CUDA 12.8+ supports 10.0a and 12.0
-        FI_TORCH_CUDA_ARCH_LIST="7.5 8.0 8.9 9.0a 10.0a 12.0"
+        FI_TORCH_CUDA_ARCH_LIST="8.0 8.9"
     fi
     echo "🏗️  Building FlashInfer for arches: ${FI_TORCH_CUDA_ARCH_LIST}"
     # Needed to build AOT kernels
